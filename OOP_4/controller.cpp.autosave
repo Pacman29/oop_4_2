@@ -1,0 +1,37 @@
+#include "controller.h"
+
+controller::controller() : _floor_count(0)
+{
+   
+}
+
+bool controller::add_button()
+{
+    button* btn = new button(this->_floor_count);
+    if(!btn)
+        return false;
+    this->_buttons.push_back(btn);
+    connect(btn,SIGNAL(signal_Pressed(size_t)),this,SLOT(call(size_t)));
+    this->_floor_count++;
+    this->_call_array.resize(this->_floor_count);
+    return true;
+}
+
+size_t controller::get_floor_count()
+{
+    return this->_floor_count;
+}
+
+const button *controller::get_button(size_t floor)
+{
+    if(floor == 0 || floor > this->_floor_count)
+        return NULL;
+    return this->_buttons[floor-1];
+}
+
+controller::call(size_t floor)
+{
+    this->_call_array[floor] = true;
+    
+}
+

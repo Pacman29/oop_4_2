@@ -1,0 +1,13 @@
+INPUT(
+./release/main.o
+./release/mainwindow.o
+./release/controller.o
+./release/door.o
+./release/elevator.o
+./release/button.o
+./release/moc_mainwindow.o
+./release/moc_controller.o
+./release/moc_door.o
+./release/moc_elevator.o
+./release/moc_button.o
+);

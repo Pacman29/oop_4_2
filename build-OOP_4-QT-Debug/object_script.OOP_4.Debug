@@ -1,0 +1,13 @@
+INPUT(
+./debug/main.o
+./debug/mainwindow.o
+./debug/controller.o
+./debug/door.o
+./debug/elevator.o
+./debug/button.o
+./debug/moc_mainwindow.o
+./debug/moc_controller.o
+./debug/moc_door.o
+./debug/moc_elevator.o
+./debug/moc_button.o
+);
