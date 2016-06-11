@@ -1,6 +1,6 @@
 #include "elevator.h"
 #include <QDebug>
-elevator::elevator() : state(MOVE_UP)
+elevator::elevator() : state(STOP)
 {
     this->timer.setInterval(3000);
     this->timer.setSingleShot(true);
@@ -15,32 +15,36 @@ void elevator::slots_stop()
         this->state = STOP;
         emit this->signals_stop();
     }
+    if(this->state == STOP)
+    {
+        emit this->signals_stop();
+    }
 }
 
 void elevator::slots_up()
 {
-    if(this->state == STOP)
-    {
         qDebug()<<"lift_move_up";
         this->state = MOVE_UP;
         this->timer.start();
-    }
 }
 
 void elevator::slots_down()
 {
-    if(this->state == STOP)
-    {
         qDebug()<<"lift_move_down";
         this->state = MOVE_DOWN;
         this->timer.start();
-    }
 }
 
 void elevator::slots_move()
 {
     if(this->state == MOVE_UP)
+    {
         emit this->signals_move(1);
+        return;
+    }
     if(this->state == MOVE_DOWN)
+    {
         emit this->signals_move(-1);
+        return;
+    }
 }

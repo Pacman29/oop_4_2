@@ -18,8 +18,9 @@ private:
     size_t _floor_destination;
     size_t _floor_current;
     size_t _floor_count;
-    door* _door;
-    elevator* _elevator;
+
+    door _door;
+    elevator _elevator;
     vector<button*> _buttons_in;
     QSet<size_t> _call_array;
     QTimer open_door;
@@ -36,7 +37,6 @@ signals:
     void lift_down();
     void lift_stop();
     void lift_open_door();
-    void signal_release_button(size_t floor);
 private slots:
     void call_in(size_t floor);
     void lift_wait();

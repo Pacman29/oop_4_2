@@ -58,15 +58,15 @@ static const uint qt_meta_data_button[] = {
 
  // signals: name, argc, parameters, tag, flags
        1,    1,   34,    2, 0x06 /* Public */,
-       4,    1,   37,    2, 0x06 /* Public */,
+       4,    0,   37,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       5,    0,   40,    2, 0x0a /* Public */,
-       6,    0,   41,    2, 0x0a /* Public */,
+       5,    0,   38,    2, 0x0a /* Public */,
+       6,    0,   39,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3,    2,
-    QMetaType::Void, 0x80000000 | 3,    2,
+    QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void,
@@ -82,7 +82,7 @@ void button::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->signal_Pressed((*reinterpret_cast< size_t(*)>(_a[1]))); break;
-        case 1: _t->signal_Released((*reinterpret_cast< size_t(*)>(_a[1]))); break;
+        case 1: _t->signal_Released(); break;
         case 2: _t->slot_Pressed(); break;
         case 3: _t->slot_Released(); break;
         default: ;
@@ -97,7 +97,7 @@ void button::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
             }
         }
         {
-            typedef void (button::*_t)(size_t );
+            typedef void (button::*_t)();
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&button::signal_Released)) {
                 *result = 1;
             }
@@ -149,9 +149,8 @@ void button::signal_Pressed(size_t _t1)
 }
 
 // SIGNAL 1
-void button::signal_Released(size_t _t1)
+void button::signal_Released()
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 1, _a);
+    QMetaObject::activate(this, &staticMetaObject, 1, Q_NULLPTR);
 }
 QT_END_MOC_NAMESPACE

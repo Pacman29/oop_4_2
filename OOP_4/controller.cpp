@@ -1,31 +1,31 @@
 #include "controller.h"
 
-controller::controller() : _floor_count(0)
+controller::controller() : _floor_count(0), state(LIFT_CAN_MOVE), _floor_current(0)
 {
-    this->_door = new door();
-    this->_elevator = new elevator();
     this->open_door.setInterval(3000);
    this->open_door.setSingleShot(true);
-   connect(&this->open_door,SIGNAL(timeout()),this->_door,SLOT(slot_close()));
-   connect(this,SIGNAL(lift_up()),this->_elevator,SLOT(slots_up()));
-   connect(this,SIGNAL(lift_down()),this->_elevator,SLOT(slots_down()));
-   connect(this,SIGNAL(lift_stop()),this->_elevator,SLOT(slots_stop()));
-   connect(this->_elevator,SIGNAL(signals_move(ssize_t)),this,SLOT(lift_move(ssize_t)));
-   connect(this->_elevator,SIGNAL(signals_stop()),this,SLOT(lift_wait()));
-   connect(this,SIGNAL(lift_open_door()),this->_door,SLOT(slot_open()));
-   connect(this->_door,SIGNAL(signal_door_is_open()),this,SLOT(slot_open_door()));
-   connect(this->_door,SIGNAL(signal_door_is_close()),this,SLOT(slot_close_door()));
+
+   connect(&this->open_door,SIGNAL(timeout()),&_door,SLOT(slot_close()));
+   connect(this,SIGNAL(lift_up()),&_elevator,SLOT(slots_up()));
+   connect(this,SIGNAL(lift_down()),&_elevator,SLOT(slots_down()));
+   connect(this,SIGNAL(lift_stop()),&_elevator,SLOT(slots_stop()));
+   connect(&_elevator,SIGNAL(signals_move(ssize_t)),this,SLOT(lift_move(ssize_t)));
+   connect(&_elevator,SIGNAL(signals_stop()),this,SLOT(lift_wait()));
+   connect(this,SIGNAL(lift_open_door()),&_door,SLOT(slot_open()));
+
+   connect(&_door,SIGNAL(signal_door_is_open()),this,SLOT(slot_open_door()));
+   connect(&_door,SIGNAL(signal_door_is_close()),this,SLOT(slot_close_door()));
 }
+
 
 bool controller::add_button()
 {
-    button* btn_in = new button(this->_floor_count);
+    button* btn_in = new button(this->_floor_count+1);
     if(!btn_in)
         return false;
 
     this->_buttons_in.push_back(btn_in);
     connect(btn_in,SIGNAL(signal_Pressed(size_t)),this,SLOT(call_in(size_t)));
-    connect(this,SIGNAL(signal_release_button(size_t)),btn_in,SLOT(slot_Released()));
     this->_floor_count++;
     return true;
 }
@@ -56,22 +56,24 @@ size_t controller::max_call()
 
 void controller::call_processing()
 {
-    if(this->_call_array.contains(this->_floor_current))
-    {
-        this->_call_array.remove(this->_floor_current);
-        this->state = LIFT_CANT_MOVE;
-        emit lift_stop();
-    }
     if(!this->_call_array.isEmpty())
     {
-        this->state == LIFT_CAN_MOVE;
-        if(this->_floor_current <= max_call())
+        size_t max = max_call();
+        if(this->_floor_current < max && this->state == LIFT_CAN_MOVE)
         {
+            this->_floor_current++;
             emit this->lift_up();
         }
-        else
+        else if(this->_floor_current > max&& this->state == LIFT_CAN_MOVE)
         {
+            this->_floor_current--;
             emit this->lift_down();
+        }
+        else if(this->_call_array.contains(this->_floor_current))
+        {
+            this->_call_array.remove(this->_floor_current);
+            this->state = LIFT_CANT_MOVE;
+            emit lift_stop();
         }
     }
 }
@@ -92,12 +94,13 @@ void controller::lift_wait()
 
 void controller::lift_move(ssize_t koef)
 {
-    this->_floor_current = this->_floor_current + koef;
     call_processing();
 }
 
 void controller::slot_open_door()
 {
+    (this->_buttons_in[_floor_current-1])->slot_Released();
+    qDebug() << "door_is_open on"<< this->_floor_current<<"floor";
     this->open_door.start();
 }
 

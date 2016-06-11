@@ -15,6 +15,6 @@ void button::slot_Released()
     {
         qDebug()<<"button released";
         this->state = RELEASED;
-        emit this->signal_Released(this->_floor_number);
+        emit this->signal_Released();
     }
 }

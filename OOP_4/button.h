@@ -20,7 +20,7 @@ public:
     ~button(){}
 signals:
     void signal_Pressed(size_t);
-    void signal_Released(size_t);
+    void signal_Released();
 public slots:
     void slot_Pressed();
     void slot_Released();
