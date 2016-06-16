@@ -19,7 +19,7 @@ public:
     
 signals:
     void signals_stop();
-    void signals_move(ssize_t koef);
+    void signals_move();
 private slots:
     void slots_move();
 public slots:

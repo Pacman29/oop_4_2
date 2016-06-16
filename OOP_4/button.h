@@ -14,13 +14,12 @@ private:
     button_state state;
     size_t _floor_number;
 public:
-    button(size_t floor_number) :
-        _floor_number(floor_number),
-        state(RELEASED){}
+    button(size_t floor_number);
     ~button(){}
 signals:
     void signal_Pressed(size_t);
     void signal_Released();
+    void signal_Released_out();
 public slots:
     void slot_Pressed();
     void slot_Released();

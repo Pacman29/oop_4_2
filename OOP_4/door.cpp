@@ -6,8 +6,14 @@ door::door() : state(CLOSE)
     this->close_t.setInterval(5000);
     this->open_t.setSingleShot(true);
     this->close_t.setSingleShot(true);
+
+    this->delay_t.setInterval(5000);
+    this->delay_t.setSingleShot(true);
+
     connect(&this->open_t,SIGNAL(timeout()),this,SLOT(slot_opening()));
     connect(&this->close_t,SIGNAL(timeout()),this,SLOT(slot_closeing()));
+    connect(&this->delay_t,SIGNAL(timeout()),this,SLOT(slot_close()));
+    connect(this,SIGNAL(signal_open_door()),this,SLOT(slot_open()));
 }
 
 void door::slot_open()
@@ -36,7 +42,8 @@ void door::slot_opening()
     {
         qDebug()<<"door_open";
         this->state = OPEN;
-        emit (this->signal_door_is_open());
+        this->delay_t.start();
+        emit this->the_door_opened();
     }
 }
 

@@ -5,6 +5,7 @@ INPUT(
 ./debug/door.o
 ./debug/elevator.o
 ./debug/button.o
+./debug/call_handler.o
 ./debug/moc_mainwindow.o
 ./debug/moc_controller.o
 ./debug/moc_door.o

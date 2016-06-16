@@ -1,115 +1,90 @@
 #include "controller.h"
 
-controller::controller() : _floor_count(0), state(LIFT_CAN_MOVE), _floor_current(0)
+controller::controller() : state(LIFT_CAN_MOVE), _floor_current(0)
 {
-    this->open_door.setInterval(3000);
-   this->open_door.setSingleShot(true);
-
-   connect(&this->open_door,SIGNAL(timeout()),&_door,SLOT(slot_close()));
-   connect(this,SIGNAL(lift_up()),&_elevator,SLOT(slots_up()));
-   connect(this,SIGNAL(lift_down()),&_elevator,SLOT(slots_down()));
-   connect(this,SIGNAL(lift_stop()),&_elevator,SLOT(slots_stop()));
-   connect(&_elevator,SIGNAL(signals_move(ssize_t)),this,SLOT(lift_move(ssize_t)));
-   connect(&_elevator,SIGNAL(signals_stop()),this,SLOT(lift_wait()));
-   connect(this,SIGNAL(lift_open_door()),&_door,SLOT(slot_open()));
-
-   connect(&_door,SIGNAL(signal_door_is_open()),this,SLOT(slot_open_door()));
-   connect(&_door,SIGNAL(signal_door_is_close()),this,SLOT(slot_close_door()));
+    connect(&this->_call_hendler,SIGNAL(have_call()),this,SLOT(lift_wait()));
+    connect(this,SIGNAL(lift_stop()),&this->_elevator,SLOT(slots_stop()));
+    connect(&this->_elevator,SIGNAL(signals_stop()),this,SLOT(lift_wait_open_door()));
+    connect(&this->_door,SIGNAL(signal_door_is_close()),this,SLOT(lift_stay_with_close_door()));
+    connect(this,SIGNAL(lift_up()),&this->_elevator,SLOT(slots_up()));
+    connect(this,SIGNAL(lift_down()),&this->_elevator,SLOT(slots_down()));
+    connect(&this->_elevator,SIGNAL(signals_move()),this,SLOT(lift_wait()));
+    connect(this,SIGNAL(lift_on_floor(size_t)),&this->_call_hendler,SLOT(del_call(size_t)));
+    connect(&this->_door,SIGNAL(the_door_opened()),this,SLOT(lift_stay_with_open_door()));
 }
 
 
 bool controller::add_button()
 {
-    button* btn_in = new button(this->_floor_count+1);
-    if(!btn_in)
-        return false;
-
-    this->_buttons_in.push_back(btn_in);
-    connect(btn_in,SIGNAL(signal_Pressed(size_t)),this,SLOT(call_in(size_t)));
-    this->_floor_count++;
-    return true;
+    return this->_call_hendler.add_button();
 }
 
 size_t controller::get_floor_count()
 {
-    return this->_floor_count;
+    return this->_call_hendler.get_floor_count();
 }
 
 button *controller::get_in_button(size_t floor)
 {
-    if(floor == 0 || floor > this->_floor_count)
-        return NULL;
-    return this->_buttons_in[floor-1];
+    return this->_call_hendler.get_in_button(floor);
 }
 
-size_t controller::max_call()
-{
-    size_t floor = 0;
-    if(this->_call_array.isEmpty())
-        return 0;
-    for(QSet<size_t>::iterator it = this->_call_array.begin();
-            it != this->_call_array.end(); it++)
-        floor = (*it > floor) ? (*it) : (floor);
-    return floor;
-}
-
-
-void controller::call_processing()
-{
-    if(!this->_call_array.isEmpty())
-    {
-        size_t max = max_call();
-        if(this->_floor_current < max && this->state == LIFT_CAN_MOVE)
-        {
-            this->_floor_current++;
-            emit this->lift_up();
-        }
-        else if(this->_floor_current > max&& this->state == LIFT_CAN_MOVE)
-        {
-            this->_floor_current--;
-            emit this->lift_down();
-        }
-        else if(this->_call_array.contains(this->_floor_current))
-        {
-            this->_call_array.remove(this->_floor_current);
-            this->state = LIFT_CANT_MOVE;
-            emit lift_stop();
-        }
-    }
-}
-
-void controller::call_in(size_t floor)
-{
-    this->_call_array.insert(floor);
-    call_processing();
-}
 
 void controller::lift_wait()
 {
+        size_t dest  = this->_call_hendler.get_destination();
+        if(dest)
+        {
+            if(this->_floor_current == dest)
+            {
+                this->state = LIFT_CANT_MOVE;
+                emit this->lift_stop();
+                return;
+            }
+            if(this->state == LIFT_CLOSE_DOOR || this->state == LIFT_CAN_MOVE)
+            {
+                this->state = LIFT_CAN_MOVE;
+
+                if(this->_floor_current > dest)
+                {
+                    this->_floor_current--;
+                    emit this->lift_down();
+                }
+                else if(this->_floor_current < dest)
+                {
+                    this->_floor_current++;
+                    emit this->lift_up();
+                }
+            }
+        }
+}
+
+
+void controller::lift_wait_open_door()
+{
     if(this->state == LIFT_CANT_MOVE)
     {
-        emit this->lift_open_door();
+        this->state = LIFT_OPEN_DOOR;
+        emit this->_door.signal_open_door();
     }
 }
 
-void controller::lift_move(ssize_t koef)
+void controller::lift_stay_with_open_door()
 {
-    call_processing();
-}
-
-void controller::slot_open_door()
-{
-    (this->_buttons_in[_floor_current-1])->slot_Released();
-    qDebug() << "door_is_open on"<< this->_floor_current<<"floor";
-    this->open_door.start();
-}
-
-void controller::slot_close_door()
-{
-    if(this->state == LIFT_CANT_MOVE)
+    if(this->state == LIFT_OPEN_DOOR)
     {
-        this->state = LIFT_CAN_MOVE;
-        call_processing();
+        this->state = LIFT_CANT_MOVE;
+        emit this->lift_on_floor(this->_floor_current);
     }
 }
+
+void controller::lift_stay_with_close_door()
+{
+    if(this->state == LIFT_CANT_MOVE || this->state == LIFT_OPEN_DOOR)
+    {
+        this->state = LIFT_CLOSE_DOOR;
+        emit this->_call_hendler.have_call();
+    }
+}
+
 

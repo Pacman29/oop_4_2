@@ -39,12 +39,12 @@ void elevator::slots_move()
 {
     if(this->state == MOVE_UP)
     {
-        emit this->signals_move(1);
+        emit this->signals_move();
         return;
     }
     if(this->state == MOVE_DOWN)
     {
-        emit this->signals_move(-1);
+        emit this->signals_move();
         return;
     }
 }

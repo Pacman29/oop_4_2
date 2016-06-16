@@ -10,11 +10,11 @@ MainWindow::MainWindow(QWidget *parent) :
     for(size_t i = 0; i!=5; ++i)
         c.add_button();
 
-    connect(c.get_in_button(1),SIGNAL(signal_Released()),this,SLOT(on_pushButton_released()));
-    connect(c.get_in_button(2),SIGNAL(signal_Released()),this,SLOT(on_pushButton_2_released()));
-    connect(c.get_in_button(3),SIGNAL(signal_Released()),this,SLOT(on_pushButton_3_released()));
-    connect(c.get_in_button(4),SIGNAL(signal_Released()),this,SLOT(on_pushButton_4_released()));
-    connect(c.get_in_button(5),SIGNAL(signal_Released()),this,SLOT(on_pushButton_5_released()));
+    connect(c.get_in_button(1),SIGNAL(signal_Released_out()),this,SLOT(on_pushButton_released()));
+    connect(c.get_in_button(2),SIGNAL(signal_Released_out()),this,SLOT(on_pushButton_2_released()));
+    connect(c.get_in_button(3),SIGNAL(signal_Released_out()),this,SLOT(on_pushButton_3_released()));
+    connect(c.get_in_button(4),SIGNAL(signal_Released_out()),this,SLOT(on_pushButton_4_released()));
+    connect(c.get_in_button(5),SIGNAL(signal_Released_out()),this,SLOT(on_pushButton_5_released()));
 }
 
 MainWindow::~MainWindow()

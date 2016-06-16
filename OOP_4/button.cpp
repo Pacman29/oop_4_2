@@ -1,4 +1,11 @@
 #include "button.h"
+button::button(size_t floor_number) :
+    _floor_number(floor_number),
+    state(RELEASED)
+{
+    connect(this,SIGNAL(signal_Released()),this,SLOT(slot_Released()));
+}
+
 void button::slot_Pressed()
 {
     if(this->state == RELEASED)
@@ -15,6 +22,6 @@ void button::slot_Released()
     {
         qDebug()<<"button released";
         this->state = RELEASED;
-        emit this->signal_Released();
+        emit this->signal_Released_out();
     }
 }

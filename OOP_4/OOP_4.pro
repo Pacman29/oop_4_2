@@ -17,12 +17,14 @@ SOURCES += main.cpp\
     controller.cpp \
     door.cpp \
     elevator.cpp \
-    button.cpp
+    button.cpp \
+    call_handler.cpp
 
 HEADERS  += mainwindow.h \
     controller.h \
     door.h \
     elevator.h \
-    button.h
+    button.h \
+    call_handler.h
 
 FORMS    += mainwindow.ui

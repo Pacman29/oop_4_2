@@ -5,6 +5,7 @@ INPUT(
 ./release/door.o
 ./release/elevator.o
 ./release/button.o
+./release/call_handler.o
 ./release/moc_mainwindow.o
 ./release/moc_controller.o
 ./release/moc_door.o
